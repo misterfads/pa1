@@ -68,4 +68,8 @@ describe('run(source, config) function', () => {
   });
 
   // TODO: add additional tests here to ensure the compiler runs as expected
+  it('adds two numbers', async() => {
+    const result = await run("2 + 3", config);
+    expect(result).to.equal(5);
+  });
 });

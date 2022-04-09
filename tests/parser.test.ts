@@ -28,6 +28,27 @@ describe('traverseExpr(c, s) function', () => {
 
 describe('traverseStmt(c, s) function', () => {
   // TODO: add tests here to ensure traverseStmt works as expected
+  it('define a variable', () => {
+    const source = "x = 5";
+    const cursor = parser.parse(source).cursor();
+
+    // go to statement
+    cursor.firstChild();
+    // go to expression
+    // cursor.firstChild();
+
+    const parsedStmt = traverseStmt(cursor, source);
+
+    // Note: we have to use deep equality when comparing objects
+    expect(parsedStmt).to.deep.equal({
+      "tag": "define",
+      "name": "x",
+      "value": {
+        "tag": "num",
+        "value": 5
+      }
+    });
+  })
 });
 
 describe('traverse(c, s) function', () => {

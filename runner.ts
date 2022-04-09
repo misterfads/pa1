@@ -26,11 +26,15 @@ export async function run(source : string, config: any) : Promise<number> {
   const parsed = parse(source);
   var returnType = "";
   var returnExpr = "";
-  const lastExpr = parsed[parsed.length - 1]
-  if(lastExpr.tag === "expr") {
-    returnType = "(result i32)";
-    returnExpr = "(local.get $$last)"
+  console.log("Parsed length of statements:", parsed.length);
+  if (parsed.length > 0) {
+    const lastExpr = parsed[parsed.length - 1]
+    if(lastExpr.tag === "expr") {
+      returnType = "(result i32)";
+      returnExpr = "(local.get $$last)"
+    }
   }
+
   const compiled = compiler.compile(source);
   const importObject = config.importObject;
   const wasmSource = `(module

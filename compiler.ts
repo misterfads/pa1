@@ -10,14 +10,44 @@ type CompileResult = {
   wasmSource: string,
 };
 
+export function validExpr(expr: Expr, definedVars : Set<string>) : boolean {
+  //explore Expr and see if there is any variable being used that is not in definedVars
+  console.log("CHECKING VALIDEXPR")
+  switch(expr.tag) {
+    case "num":
+      return true;
+    case "id":
+      var has : boolean = definedVars.has(expr.name)
+      if (!has)
+        return false;
+      return true;
+    case "builtin1":
+      return validExpr(expr.arg, definedVars);
+    case "builtin2":
+      var first : boolean = validExpr(expr.arg1, definedVars);
+      var sec : boolean = validExpr(expr.arg2, definedVars);
+      return first && sec;
+    case "binexpr":
+      var left : boolean = validExpr(expr.left, definedVars);
+      var right : boolean = validExpr(expr.right, definedVars);
+      return left && right;
+  }
+
+}
+
 export function compile(source: string) : CompileResult {
   const ast = parse(source);
-  const definedVars = new Set();
+  const definedVars : Set<string> = new Set();
   ast.forEach(s => {
     switch(s.tag) {
       case "define":
+        if (!validExpr(s.value, definedVars))
+          throw new Error("ReferenceError: Variable referenced before definition")
         definedVars.add(s.name);
         break;
+      case "expr":
+        if (!validExpr(s.expr, definedVars))
+          throw new Error("ReferenceError: Variable referenced before definition")
     }
   }); 
   const scratchVar : string = `(local $$last i32)`;
